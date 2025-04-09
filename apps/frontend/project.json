@@ -1,0 +1,30 @@
+{
+  "name": "frontend",
+  "targets": {
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "options": {
+        "buildTarget": "frontend:build"
+      }
+    },
+    "build": {
+      "executor": "@nx/vite:build",
+      "options": {
+        "outputPath": "dist/apps/frontend",
+        "configFile": "apps/frontend/vite.config.ts",
+        "index": "apps/frontend/index.html",
+        "main": "apps/frontend/src/main.tsx",
+        "polyfills": [],
+        "tsConfig": "apps/frontend/tsconfig.app.json",
+        "assets": ["apps/frontend/public"]
+      }
+    },
+    "preview": {
+      "executor": "@nx/vite:preview",
+      "options": {
+        "buildTarget": "frontend:build"
+      }
+    }
+  },
+  "tags": []
+}
