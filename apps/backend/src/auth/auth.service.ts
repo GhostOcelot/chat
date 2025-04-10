@@ -1,4 +1,9 @@
 import {
+  TokenExpiredError,
+  JsonWebTokenError,
+  NotBeforeError,
+} from 'jsonwebtoken';
+import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -9,11 +14,7 @@ import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthJwtService } from '../jwt/jwt.service';
-
-export interface AuthBody {
-  email: string;
-  password: string;
-}
+import { AuthDTO } from './auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +24,7 @@ export class AuthService {
     private readonly authJwtService: AuthJwtService
   ) {}
 
-  async register(body: AuthBody) {
+  async register(body: AuthDTO) {
     const { email, password } = body;
     try {
       const existingUser = await this.userRepo.findOne({ where: { email } });
@@ -43,7 +44,7 @@ export class AuthService {
     }
   }
 
-  async login(body: AuthBody) {
+  async login(body: AuthDTO) {
     const { email, password } = body;
     try {
       const user = await this.userRepo.findOne({ where: { email } });
@@ -52,11 +53,34 @@ export class AuthService {
       const isVerified = await bcrypt.compare(password, user.password);
       if (!isVerified)
         throw new UnauthorizedException('email or password incorrect');
-      const token = this.authJwtService.createToken(user);
 
-      return token;
+      const accessToken = this.authJwtService.createAccessToken(user);
+      const refreshToken = this.authJwtService.createRefreshToken(user);
+
+      return { message: 'Login successful', accessToken, refreshToken };
     } catch (err) {
       if (err instanceof UnauthorizedException) throw err;
+      throw new InternalServerErrorException('An error occurred during login');
+    }
+  }
+
+  async refresh(token: string) {
+    try {
+      const refreshToken = this.authJwtService.verifyRefreshToken(token);
+      const { email, id } = refreshToken;
+      const newAccessToken = this.authJwtService.createAccessToken({
+        email,
+        id,
+      } as User);
+
+      return { accessToken: newAccessToken };
+    } catch (err) {
+      if (
+        err instanceof TokenExpiredError ||
+        err instanceof JsonWebTokenError ||
+        err instanceof NotBeforeError
+      )
+        throw new UnauthorizedException('Invalid or expired refresh token');
       throw new InternalServerErrorException('An error occurred during login');
     }
   }

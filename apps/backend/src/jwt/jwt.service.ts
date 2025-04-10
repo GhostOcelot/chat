@@ -6,14 +6,31 @@ import { User } from '../entities/user.entity';
 export class AuthJwtService {
   constructor(private readonly jwtService: JwtService) {}
 
-  createToken(user: User) {
+  createAccessToken(user: User) {
     const payload = { email: user.email, id: user.id };
-    return this.jwtService.sign(payload);
+    return this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: '15m',
+    });
   }
 
-  verifyToken(token: string) {
+  createRefreshToken(user: User) {
+    const payload = { email: user.email, id: user.id };
+    return this.jwtService.sign(payload, {
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: '7d',
+    });
+  }
+
+  verifyAccessToken(token: string) {
     return this.jwtService.verify(token, {
       secret: process.env.JWT_SECRET,
+    });
+  }
+
+  verifyRefreshToken(token: string) {
+    return this.jwtService.verify(token, {
+      secret: process.env.JWT_REFRESH_SECRET,
     });
   }
 }
