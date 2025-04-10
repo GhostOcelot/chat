@@ -11,7 +11,6 @@ const Chat = () => {
   const [chat, setChat] = useState<Message[]>([]);
   const [sender, setSender] = useState('');
   const [message, setMessage] = useState('');
-
   const { socketRef } = useSocket({
     url: 'http://localhost:3001',
     events: [
