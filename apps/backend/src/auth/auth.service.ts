@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AuthJwtService } from '../jwt/jwt.service';
 
 export interface AuthBody {
   email: string;
@@ -18,7 +19,8 @@ export interface AuthBody {
 export class AuthService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepo: Repository<User>
+    private readonly userRepo: Repository<User>,
+    private readonly authJwtService: AuthJwtService
   ) {}
 
   async register(body: AuthBody) {
@@ -50,8 +52,9 @@ export class AuthService {
       const isVerified = await bcrypt.compare(password, user.password);
       if (!isVerified)
         throw new UnauthorizedException('email or password incorrect');
+      const token = this.authJwtService.createToken(user);
 
-      return user;
+      return token;
     } catch (err) {
       if (err instanceof UnauthorizedException) throw err;
       throw new InternalServerErrorException('An error occurred during login');
