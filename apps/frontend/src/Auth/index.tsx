@@ -8,7 +8,6 @@ const Auth = () => {
 
   const handleRegisterUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(import.meta.env.VITE_BASE_URL);
     try {
       if (email && password) {
         const response = await fetch(
@@ -18,7 +17,7 @@ const Auth = () => {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ email, username, password }),
           }
         );
 

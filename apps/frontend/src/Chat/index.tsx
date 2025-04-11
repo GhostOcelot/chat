@@ -12,7 +12,7 @@ const Chat = () => {
   const [sender, setSender] = useState('');
   const [message, setMessage] = useState('');
   const { socketRef } = useSocket({
-    url: 'http://localhost:3001',
+    url: import.meta.env.VITE_BASE_URL,
     events: [
       {
         eventName: 'message',

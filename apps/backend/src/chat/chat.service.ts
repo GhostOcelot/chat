@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Message } from '../entities/message.entity';
 import { Chatroom } from '../entities/chatroom.entity';
 import { User } from '../entities/user.entity';
@@ -70,5 +74,31 @@ export class ChatService {
     }
 
     return users;
+  }
+
+  async createChatroom(usersIds: string[]) {
+    try {
+      if (!usersIds || usersIds.length === 0) {
+        throw new NotFoundException('No participant IDs provided');
+      }
+
+      const users = await this.userRepo.find({
+        where: { id: In(usersIds) },
+      });
+
+      if (users.length !== usersIds.length) {
+        throw new NotFoundException('One or more users not found');
+      }
+
+      const chatroom = this.chatroomRepo.create({ participants: users });
+
+      return this.chatroomRepo.save(chatroom);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error('Chatroom creation failed:', error);
+      throw new InternalServerErrorException('Failed to create chatroom');
+    }
   }
 }
