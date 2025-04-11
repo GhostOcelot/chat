@@ -5,9 +5,11 @@ import {
   WebSocketServer,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
+import { ChatMessageDTO } from './chat.dto';
 
 @WebSocketGateway({
   cors: {
@@ -30,13 +32,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('message')
-  handleMessage(@MessageBody() body: { sender: string; message: string }) {
-    this.chatService.saveMessage(body.sender, body.message);
+  handleMessage(@MessageBody() body: ChatMessageDTO) {
+    this.chatService.saveMessage(body.senderId, body.content, body.chatroomId);
     this.server.emit('message', body);
   }
 
-  // @SubscribeMessage('joinRoom')
-  // handleJoinRoom(client: Socket, roomId: string) {
-  //   client.join(roomId);
-  // }
+  @SubscribeMessage('joinRoom')
+  handleJoinRoom(@ConnectedSocket() client: Socket, roomId: string) {
+    client.join(roomId);
+  }
 }
