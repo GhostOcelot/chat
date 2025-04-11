@@ -25,14 +25,18 @@ export class AuthService {
   ) {}
 
   async register(body: AuthDTO) {
-    const { email, password } = body;
+    const { email, username, password } = body;
     try {
       const existingUser = await this.userRepo.findOne({ where: { email } });
       if (existingUser) throw new ConflictException('Email is already in use');
 
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
-      const user = this.userRepo.create({ email, password: hashedPassword });
+      const user = this.userRepo.create({
+        email,
+        username,
+        password: hashedPassword,
+      });
       await this.userRepo.save(user);
 
       return { message: 'registration successful' };

@@ -20,6 +20,7 @@ export class Message {
 
   @ManyToOne(() => Chatroom, (chatroom) => chatroom.messages, {
     onDelete: 'CASCADE',
+    nullable: false,
   })
   chatroom!: Chatroom;
 

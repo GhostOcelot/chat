@@ -61,4 +61,14 @@ export class ChatService {
 
     return chat;
   }
+
+  async getUsers() {
+    const users = await this.userRepo.find();
+
+    if (!users) {
+      throw new NotFoundException('users not found');
+    }
+
+    return users;
+  }
 }

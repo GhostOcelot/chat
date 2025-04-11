@@ -29,9 +29,6 @@ const Chat = () => {
     setMessage('');
   };
 
-  // const joinChat = () => {
-  //   socketRef.current?.emit("joinRoom", uuidv4())
-  // }
   return (
     <form onSubmit={sendMessage}>
       <input

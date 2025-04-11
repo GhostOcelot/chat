@@ -16,10 +16,13 @@ export class User {
   email!: string;
 
   @Column()
+  username!: string;
+
+  @Column()
   password!: string;
 
   @ManyToMany(() => Chatroom, (chatroom) => chatroom.participants)
-  chatrooms!: Chatroom[];
+  chatrooms?: Chatroom[];
 
   @CreateDateColumn()
   timestamp!: Date;

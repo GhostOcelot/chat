@@ -16,7 +16,7 @@ export class Chatroom {
 
   @ManyToMany(() => User, (user) => user.chatrooms, { cascade: true })
   @JoinTable()
-  participants!: User[];
+  participants?: User[];
 
   @OneToMany(() => Message, (message) => message.chatroom, {
     cascade: true,

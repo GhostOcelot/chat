@@ -1,12 +1,14 @@
-import "./App.css"
-import Chat from "./Chat"
+import './App.css';
+import Auth from './Auth';
+import Chat from './Chat';
 
 function App() {
   return (
     <>
+      <Auth />
       <Chat />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

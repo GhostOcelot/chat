@@ -18,4 +18,11 @@ export class ChatController {
 
     return chat;
   }
+
+  @Get('users')
+  async getUsers() {
+    const chat = await this.chatService.getUsers();
+
+    return chat;
+  }
 }
